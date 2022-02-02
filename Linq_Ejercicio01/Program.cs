@@ -17,7 +17,11 @@ namespace Linq_Ejercicio01
             //ce.getEmpleadosPildoras();
 
             ControlProductOrder fabricaProductOrder = new ControlProductOrder();
-            fabricaProductOrder.getInnerJoin();
+            //fabricaProductOrder.getInnerJoin();
+            //fabricaProductOrder.getLeftJoin();
+            //fabricaProductOrder.getCrossJoin();
+            fabricaProductOrder.getGroupJoin();
+
 
 
 
@@ -192,12 +196,77 @@ namespace Linq_Ejercicio01
                                   o.OrderId,
                                   p.ProductId,
                                   p.Name
+                              });
+                Console.WriteLine("Inner Join: \n");
+                Console.WriteLine(String.Join(",\n", joined));
+
+            }
+
+
+            public void getLeftJoin()
+            {
+                //var leftJoin = (from p in Products
+                //                join o in Orders on p.ProductId equals o.ProductId into g
+                //                from lj in g.DefaultIfEmpty()
+                //                select new
+                //                {
+                //                    OrderId = (int?)lj.OrderId,
+                //                    p.ProductId,
+                //                    p.Name
+                //                });
+
+                var joined = (from p in Products
+                              join o in Orders on p.ProductId equals o.ProductId into g
+                              from lj in g.DefaultIfEmpty()
+                              select new
+                              {
+                                  //For the empty records in lj, OrderId would be NULL
+                                  OrderId = (int?)lj.OrderId,
+                                  p.ProductId,
+                                  p.Name
                               }).ToList();
 
-                foreach (Product Producto1 in joined)
-                {
-                    Producto1.getDatosProduct();
-                }
+                Console.WriteLine("Left Join: \n");
+                Console.WriteLine(String.Join(",\n", joined));
+            }
+            public void getCrossJoin()
+            {
+                //var crossJoin = (from p in Products
+                //                 from o in Orders
+                //                 select new
+                //                 {
+                //                     o.OrderId,
+                //                     p.ProductId,
+                //                     p.Name
+                //                 });
+
+                var joined = (from p in Products
+                              from o in Orders
+                              select new
+                              {
+                                  o.OrderId,
+                                  p.ProductId,
+                                  p.Name
+                              }).ToList();
+
+                Console.WriteLine("Cross Join: \n");
+                Console.WriteLine(String.Join(",\n", joined));
+            }
+
+            public void getGroupJoin()
+            {
+                var joined = (from p in Products
+                              join o in Orders on p.ProductId equals o.ProductId
+                              into t
+                              select new
+                              {
+                                  p.ProductId,
+                                  p.Name,
+                                  Orders = t
+                              });
+
+                Console.WriteLine("Group Join: \n");
+                Console.WriteLine(String.Join(",\n", joined));
             }
 
         }
