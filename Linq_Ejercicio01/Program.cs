@@ -20,7 +20,11 @@ namespace Linq_Ejercicio01
             //fabricaProductOrder.getInnerJoin();
             //fabricaProductOrder.getLeftJoin();
             //fabricaProductOrder.getCrossJoin();
-            fabricaProductOrder.getGroupJoin();
+            //fabricaProductOrder.getGroupJoin();
+
+            //fabricaProductOrder.getOrderByProduct();
+
+            fabricaProductOrder.getOrderDetailsExtencionMethods();
 
 
 
@@ -161,29 +165,18 @@ namespace Linq_Ejercicio01
                 Products = new List<Product>();
                 Orders = new List<Order>();
 
-                Products.Add(new Product
-                {
-                    ProductId = 1,
-                    Name = "Book nr 1",
-                    Price = 25
-                });
-                Products.Add(new Product
-                {
-                    ProductId = 2,
-                    Name = "Book nr 2",
-                    Price = 15
-                });
-                Products.Add(new Product
-                {
-                    ProductId = 3,
-                    Name = "Book nr 3",
-                    Price = 20
-                });
+                Products.Add(new Product { ProductId = 1, Name = "Book nr 1", Price = 11 });
+                Products.Add(new Product { ProductId = 2, Name = "Book nr 2", Price = 12 });
+                Products.Add(new Product { ProductId = 3, Name = "Book nr 3", Price = 13 });
+                Products.Add(new Product { ProductId = 4, Name = "Book nr 4", Price = 14 });
 
-                Orders.Add(new Order { OrderId = 1, ProductId = 1 });
-                Orders.Add(new Order { OrderId = 2, ProductId = 1 });
-                Orders.Add(new Order { OrderId = 3, ProductId = 2 });
-                Orders.Add(new Order { OrderId = 4, ProductId = null });
+                Orders.Add(new Order { OrderId = 1, ProductId = 1, Movimiento = "Alta" });
+                Orders.Add(new Order { OrderId = 2, ProductId = 2, Movimiento = "Alta" });
+                Orders.Add(new Order { OrderId = 3, ProductId = 1, Movimiento = "Baja" });
+                Orders.Add(new Order { OrderId = 4, ProductId = 3, Movimiento = "Alta" });
+                Orders.Add(new Order { OrderId = 5, ProductId = null, Movimiento = "Alta" });
+                Orders.Add(new Order { OrderId = 6, ProductId = 1, Movimiento = "Alta" });
+                Orders.Add(new Order { OrderId = 7, ProductId = null, Movimiento = "Alta" });
             }
 
 
@@ -269,7 +262,67 @@ namespace Linq_Ejercicio01
                 Console.WriteLine(String.Join(",\n", joined));
             }
 
+            public void getOrderByProduct()
+            {
+                var details = from o in Orders
+                              orderby o.OrderId
+                              join p in Products
+                              on o.ProductId equals p.ProductId
+                              into G
+                              select new
+                              {
+                                  Orden = o.OrderId,
+                                  Producto = from p2
+                                             in G
+                                             orderby p2.ProductId
+                                             select p2
+
+                              };
+
+                
+
+                foreach (var G in details)
+                {
+                    Console.WriteLine(G.Orden);
+
+                    foreach (var product in G.Producto)
+                    {
+
+                        Console.WriteLine("* {0}",
+                            product.Price);
+                    }
+                }
+
+
+                Console.WriteLine("Ordenes por Prodcuto: \n");
+
+                //Console.WriteLine(String.Join(",\n", details));
+
+
+            }
+
+            public void getOrderDetailsExtencionMethods()
+            {
+                var productos = Orders.GroupBy(a => a.ProductId);|
+
+                foreach (var producto in productos)
+                {
+                    Console.WriteLine("Producto: ==== {0} ====", producto.Key);
+
+                    foreach (var order in producto)
+                    {
+                        Console.WriteLine("Orden: * {0}, Movimiento: {1}", order.OrderId, order.Movimiento);
+                    }
+                }
+
+
+                var pr = Products.Select(Orders.Where(p => p.ProductId));
+            }
+
+
         }
+
+
         class Product
         {
             public int ProductId { get; set; }
@@ -288,6 +341,8 @@ namespace Linq_Ejercicio01
         {
             public int OrderId { get; set; }
             public int? ProductId { get; set; }
+
+            public string Movimiento { get; set; }
 
             public void getDatosOrder()
             {
