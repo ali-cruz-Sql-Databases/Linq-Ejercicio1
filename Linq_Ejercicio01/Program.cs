@@ -169,6 +169,7 @@ namespace Linq_Ejercicio01
                 Products.Add(new Product { ProductId = 2, Name = "Book nr 2", Price = 12 });
                 Products.Add(new Product { ProductId = 3, Name = "Book nr 3", Price = 13 });
                 Products.Add(new Product { ProductId = 4, Name = "Book nr 4", Price = 14 });
+                Products.Add(new Product { ProductId = 5, Name = "Book nr 5", Price = 15 });
 
                 Orders.Add(new Order { OrderId = 1, ProductId = 1, Movimiento = "Alta" });
                 Orders.Add(new Order { OrderId = 2, ProductId = 2, Movimiento = "Alta" });
@@ -177,6 +178,10 @@ namespace Linq_Ejercicio01
                 Orders.Add(new Order { OrderId = 5, ProductId = null, Movimiento = "Alta" });
                 Orders.Add(new Order { OrderId = 6, ProductId = 1, Movimiento = "Alta" });
                 Orders.Add(new Order { OrderId = 7, ProductId = null, Movimiento = "Alta" });
+                Orders.Add(new Order { OrderId = 8, ProductId = 3, Movimiento = "Baja" });
+                Orders.Add(new Order { OrderId = 9, ProductId = 1, Movimiento = "Baja" });
+                Orders.Add(new Order { OrderId = 10, ProductId = 5, Movimiento = "Alta" });
+                Orders.Add(new Order { OrderId = 11, ProductId = null, Movimiento = "Alta" });
             }
 
 
@@ -303,20 +308,26 @@ namespace Linq_Ejercicio01
 
             public void getOrderDetailsExtencionMethods()
             {
-                var productos = Orders.GroupBy(a => a.ProductId);|
+                var productLastMovement = Orders.GroupBy(a => a.ProductId)
+                                            .Select(g => g.OrderByDescending(i => i.OrderId)
+                                            .FirstOrDefault());
 
-                foreach (var producto in productos)
-                {
-                    Console.WriteLine("Producto: ==== {0} ====", producto.Key);
+                var products = Products.GroupBy(p => p.ProductId);
 
-                    foreach (var order in producto)
-                    {
-                        Console.WriteLine("Orden: * {0}, Movimiento: {1}", order.OrderId, order.Movimiento);
-                    }
-                }
+                var ordenes = Orders.GroupBy(a => a.Movimiento);
+
+                //foreach (var producto in productLastMovement)
+                //{
+                //    Console.WriteLine("Producto: ==== {0} ====", producto.ProductId);
+
+                //    foreach (var order in producto)
+                //    {
+                //        Console.WriteLine("Orden: * {0}, Movimiento: {1}", order.OrderId, order.Movimiento);
+                //    }
+                //}
 
 
-                var pr = Products.Select(Orders.Where(p => p.ProductId));
+                //var pr = Products.Select(Orders.Where(p => p.ProductId));
             }
 
 
