@@ -24,7 +24,16 @@ namespace Linq_Ejercicio01
 
             //fabricaProductOrder.getOrderByProduct();
 
-            fabricaProductOrder.getOrderDetailsExtencionMethods();
+            //fabricaProductOrder.getOrderDetailsExtencionMethods();
+
+            ControlEmployeeAddress cEmployeeAddress = new ControlEmployeeAddress();
+            //cEmployeeAddress.joinEmployeeAddressMethodSyntax();
+            //cEmployeeAddress.joinEmployeeAddressQuerySyntax();
+
+
+            ControlEmployeeAddressDepartament cEmployeeAdDep = new ControlEmployeeAddressDepartament();
+            cEmployeeAdDep.joinQuerySyntax();
+            cEmployeeAdDep.joinMethodSyntax();
 
 
 
@@ -358,6 +367,276 @@ namespace Linq_Ejercicio01
             public void getDatosOrder()
             {
                 Console.WriteLine("OrderId: {0}, ProductId: {1}", OrderId, ProductId);
+            }
+        }
+
+
+        /*          
+          * ****************************************************************************************************************************
+        */
+
+        class ControlEmployeeAddress
+        {
+            public ControlEmployeeAddress()
+            {
+
+            }
+
+            public void joinEmployeeAddressMethodSyntax()
+            {
+                // Method Syntax
+                var JoinUsingMS = Employee.GetAllEmployees() //Outer Data Source
+                                          .Join(
+                                              Address.GetAllAddresses(),  //Inner Data Source
+                                              employee => employee.AddressId, //Inner Key Selector
+                                              address => address.ID, //Outer Key selector
+                                              (employee, address) => new //Projecting the data into a result set
+                                              {
+                                                  EmployeeName = employee.Name,
+                                                  AddressLine = address.AddressLine
+                                              }).ToList();
+                foreach (var employee in JoinUsingMS)
+                {
+                    Console.WriteLine("Name: {0} \t\t Address: {1}", employee.EmployeeName, employee.AddressLine);
+                }
+                Console.ReadLine();
+            }
+
+            public void joinEmployeeAddressQuerySyntax()
+            {
+                var JoinUsingQS = (from e in Employee.GetAllEmployees()
+                                   join a in Address.GetAllAddresses()
+                                   on e.AddressId equals a.ID
+                                   select new
+                                   {
+                                       eName = e.Name,
+                                       eAddress = a.AddressLine
+                                   }).ToList();
+
+                foreach (var employee in JoinUsingQS)
+                {
+                    Console.WriteLine("Name: {0}. \t Address: {1}", employee.eName, employee.eAddress);
+                }
+            }
+
+
+        }
+
+
+        public class Employee
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public int AddressId { get; set; }
+            public static List<Employee> GetAllEmployees()
+            {
+                return new List<Employee>()
+            {
+                new Employee { ID = 1, Name = "Preety", AddressId = 1 },
+                new Employee { ID = 2, Name = "Priyanka", AddressId = 2 },
+                new Employee { ID = 3, Name = "Anurag", AddressId = 3 },
+                new Employee { ID = 4, Name = "Pranaya", AddressId = 4 },
+                new Employee { ID = 5, Name = "Hina", AddressId = 5 },
+                new Employee { ID = 6, Name = "Sambit", AddressId = 6 },
+                new Employee { ID = 7, Name = "Happy", AddressId = 7},
+                new Employee { ID = 8, Name = "Tarun", AddressId = 8 },
+                new Employee { ID = 9, Name = "Santosh", AddressId = 9 },
+                new Employee { ID = 10, Name = "Raja", AddressId = 10},
+                new Employee { ID = 11, Name = "Sudhanshu", AddressId = 11}
+            };
+            }
+        }
+
+        public class Address
+        {
+            public int ID { get; set; }
+            public string AddressLine { get; set; }
+            public static List<Address> GetAllAddresses()
+            {
+                return new List<Address>()
+            {
+                new Address { ID = 1, AddressLine = "AddressLine1"},
+                new Address { ID = 2, AddressLine = "AddressLine2"},
+                new Address { ID = 3, AddressLine = "AddressLine3"},
+                new Address { ID = 4, AddressLine = "AddressLine4"},
+                new Address { ID = 5, AddressLine = "AddressLine5"},
+                new Address { ID = 9, AddressLine = "AddressLine9"},
+                new Address { ID = 10, AddressLine = "AddressLine10"},
+                new Address { ID = 11, AddressLine = "AddressLine11"},
+                new Address { ID = 12, AddressLine = "AddressLine12"}
+            };
+            }
+        }
+
+
+        /*          
+          * ****************************************************************************************************************************
+        */
+
+
+        class ControlEmployeeAddressDepartament
+        {
+            public void joinQuerySyntax()
+            {
+                // data source 1
+                var joins = (from e in Employee2.GetAllEmployees()
+                                 // join data source 2
+                             join a in Address2.GetAllAddresses()
+                             on e.AddressId equals a.ID
+                             // join data source 3
+                             join d in Department2.GetAllDepartments()
+                             on e.DepartmentId equals d.ID
+                             select new
+                             {
+                                 ID = e.ID,
+                                 Name = e.Name,
+                                 Department = d.Name,
+                                 Address = a.AddressLine
+                             }).ToList();
+
+                foreach (var employee in joins)
+                {
+                    Console.WriteLine("ID: {0}, \t Name {1}, \t Address: {2}, \t Department: {3}", 
+                        employee.ID, employee.Name, employee.Address, employee.Department);
+                }
+            }
+
+            public void joinMethodSyntax()
+            {
+                // Data Source 1
+                var joinMethodSyntax = Employee2.GetAllEmployees()
+                    // Join Data Source 2
+                    .Join(Address2.GetAllAddresses(),
+                        // Outer Key Selector - 'on x.xid equals y.id'
+                        // empLevel1 - 
+                        e => e.AddressId,
+                        // Inner Key Selector
+                        // addLevel1
+                        a => a.ID,
+                        (e, a) => new { e, a }
+                    )
+                    .Join(Department2.GetAllDepartments(),
+                        // empLevel2
+                        e => e.e.DepartmentId,
+                        // addLevel1
+                        d => d.ID,
+                        (e, d) => new { e, d }
+                    )
+                    .Select(e => new
+                    {
+                        ID = e.e.e.ID,
+                        Name = e.e.e.Name,
+                        Address = e.e.a.AddressLine,
+                        Department = e.d.Name
+                    }).ToList();
+
+                foreach (var employee in joinMethodSyntax)
+                {
+                    Console.WriteLine("ID: {0}, Name {1}, Address {2}, Department {3}",
+                        employee.ID, employee.Name, employee.Address, employee.Department);
+                }
+
+            }
+        }
+        public class Employee2
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public int AddressId { get; set; }
+            public int DepartmentId { get; set; }
+            public static List<Employee2> GetAllEmployees()
+            {
+                return new List<Employee2>()
+            {
+                new Employee2 { ID = 1, Name = "Preety", AddressId = 1, DepartmentId = 10    },
+                new Employee2 { ID = 2, Name = "Priyanka", AddressId = 2, DepartmentId =20   },
+                new Employee2 { ID = 3, Name = "Anurag", AddressId = 3, DepartmentId = 30    },
+                new Employee2 { ID = 4, Name = "Pranaya", AddressId = 4, DepartmentId = 0    },
+                new Employee2 { ID = 5, Name = "Hina", AddressId = 5, DepartmentId = 0       },
+                new Employee2 { ID = 6, Name = "Sambit", AddressId = 6, DepartmentId = 0     },
+                new Employee2 { ID = 7, Name = "Happy", AddressId = 7, DepartmentId = 0      },
+                new Employee2 { ID = 8, Name = "Tarun", AddressId = 8, DepartmentId = 0      },
+                new Employee2 { ID = 9, Name = "Santosh", AddressId = 9, DepartmentId = 10   },
+                new Employee2 { ID = 10, Name = "Raja", AddressId = 10, DepartmentId = 20    },
+                new Employee2 { ID = 11, Name = "Ramesh", AddressId = 11, DepartmentId = 30  }
+            };
+            }
+        }
+        public class Address2
+        {
+            public int ID { get; set; }
+            public string AddressLine { get; set; }
+            public static List<Address2> GetAllAddresses()
+            {
+                return new List<Address2>()
+            {
+                new Address2 { ID = 1, AddressLine = "AddressLine1"      },
+                new Address2 { ID = 2, AddressLine = "AddressLine2"      },
+                new Address2 { ID = 3, AddressLine = "AddressLine3"      },
+                new Address2 { ID = 4, AddressLine = "AddressLine4"      },
+                new Address2 { ID = 5, AddressLine = "AddressLine5"      },
+                new Address2 { ID = 9, AddressLine = "AddressLine9"      },
+                new Address2 { ID = 10, AddressLine = "AddressLine10"    },
+                new Address2 { ID = 11, AddressLine = "AddressLine11"    },
+            };
+            }
+        }
+        public class Department2
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public static List<Department2> GetAllDepartments()
+            {
+                return new List<Department2>()
+                {
+                    new Department2 { ID = 10, Name = "IT"       },
+                    new Department2 { ID = 20, Name = "HR"       },
+                    new Department2 { ID = 30, Name = "Payroll"  },
+                };
+            }
+        }
+
+
+        /*          
+  * ****************************************************************************************************************************
+*/
+
+        public class Employee3
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public int DepartmentId { get; set; }
+            public static List<Employee3> GetAllEmployees()
+            {
+                return new List<Employee3>()
+            {
+                new Employee3 { ID = 1, Name = "Preety", DepartmentId = 10},
+                new Employee3 { ID = 2, Name = "Priyanka", DepartmentId =20},
+                new Employee3 { ID = 3, Name = "Anurag", DepartmentId = 30},
+                new Employee3 { ID = 4, Name = "Pranaya", DepartmentId = 30},
+                new Employee3 { ID = 5, Name = "Hina", DepartmentId = 20},
+                new Employee3 { ID = 6, Name = "Sambit", DepartmentId = 10},
+                new Employee3 { ID = 7, Name = "Happy", DepartmentId = 10},
+                new Employee3 { ID = 8, Name = "Tarun", DepartmentId = 0},
+                new Employee3 { ID = 9, Name = "Santosh", DepartmentId = 10},
+                new Employee3 { ID = 10, Name = "Raja", DepartmentId = 20},
+                new Employee3 { ID = 11, Name = "Ramesh", DepartmentId = 30}
+            };
+            }
+        }
+
+        public class Department3
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public static List<Department3> GetAllDepartments()
+            {
+                return new List<Department3>()
+                {
+                    new Department3 { ID = 10, Name = "IT"},
+                    new Department3 { ID = 20, Name = "HR"},
+                    new Department3 { ID = 30, Name = "Sales"  },
+                };
             }
         }
 
