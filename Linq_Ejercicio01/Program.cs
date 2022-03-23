@@ -22,8 +22,7 @@ namespace Linq_Ejercicio01
             //fabricaProductOrder.getCrossJoin();
             //fabricaProductOrder.getGroupJoin();
 
-            Console.WriteLine("getOrderByProduct");
-            fabricaProductOrder.getOrderByProduct();
+            //fabricaProductOrder.getOrderByProduct();
 
             //fabricaProductOrder.getOrderDetailsExtencionMethods();
 
@@ -33,10 +32,29 @@ namespace Linq_Ejercicio01
 
 
             ControlEmployeeAddressDepartament cEmployeeAdDep = new ControlEmployeeAddressDepartament();
-            cEmployeeAdDep.joinQuerySyntax();
-            cEmployeeAdDep.joinMethodSyntax();
+            //cEmployeeAdDep.joinQuerySyntax();
+            //cEmployeeAdDep.joinMethodSyntax();
+
+            ControlEmployeeDepartment3 cEmployeeDep3 = new ControlEmployeeDepartment3();
+            //cEmployeeDep3.groupJoinMethodSyntax();
+            //cEmployeeDep3.groupJoinQuerySyntax();
+
+            ControlSelectMany cSelectMany = new ControlSelectMany();
+            //cSelectMany.selectMany();
+            //cSelectMany.selectManyQuerySyntax();
+
+            //cSelectMany.selectMany();
+            //cSelectMany.selectMany2ComplexType();
+            //cSelectMany.selectMany2Method();
+            //cSelectMany.selectMany2Query();
+            //cSelectMany.selectManyQuerySyntax();
+            //cSelectMany.selectManyMethodSyntaxPersonalize();
+            //cSelectMany.selectManyQuerySyntaxPersonalize();
 
 
+            ControlEmployeeAddress6 cELeftJoin = new ControlEmployeeAddress6();
+            cELeftJoin.leftJoinQuerySyntax();
+            cELeftJoin.leftJoinMethodSyntax();
 
 
 
@@ -69,6 +87,7 @@ namespace Linq_Ejercicio01
 
         /*
          * ****************************************************************************************************************************
+         * Ejercicio 1: Query Syntax where, orderby, join
          */
         class ControlEmpresasEmpleados
         {
@@ -89,7 +108,9 @@ namespace Linq_Ejercicio01
 
             public void getCEO()
             {
-                IEnumerable<Empleado> ceos = from empleado in listaEmpleados where empleado.Cargo == "CEO" select empleado;
+                IEnumerable<Empleado> ceos = from empleado in listaEmpleados
+                                             where empleado.Cargo == "CEO"
+                                             select empleado;
 
                 foreach (Empleado empleado1 in ceos)
                 {
@@ -100,7 +121,9 @@ namespace Linq_Ejercicio01
 
             public void getEmpleadosOrdenados()
             {
-                IEnumerable<Empleado> empleados = from empleado in listaEmpleados orderby empleado.Nombre ascending select empleado;
+                IEnumerable<Empleado> empleados = from empleado in listaEmpleados
+                                                  orderby empleado.Nombre ascending
+                                                  select empleado;
 
                 foreach (Empleado empleado1 in empleados)
                 {
@@ -163,6 +186,7 @@ namespace Linq_Ejercicio01
 
         /*
          * ****************************************************************************************************************************
+         *  Ejercicio 2. Uso de Query Syntax, left join extension methods
          */
 
         class ControlProductOrder
@@ -294,7 +318,7 @@ namespace Linq_Ejercicio01
 
                               };
 
-                
+
 
                 foreach (var G in details)
                 {
@@ -374,6 +398,7 @@ namespace Linq_Ejercicio01
 
         /*          
           * ****************************************************************************************************************************
+          * Ejercicio 3. Join 2 tablas. Query Syntax, Method Syntax join
         */
 
         class ControlEmployeeAddress
@@ -389,8 +414,8 @@ namespace Linq_Ejercicio01
                 var JoinUsingMS = Employee.GetAllEmployees() //Outer Data Source
                                           .Join(
                                               Address.GetAllAddresses(),  //Inner Data Source
-                                              employee => employee.AddressId, //Inner Key Selector
-                                              address => address.ID, //Outer Key selector
+                                              employee => employee.AddressId, //Outer Key Selector
+                                              address => address.ID, //Inner Key selector
                                               (employee, address) => new //Projecting the data into a result set
                                               {
                                                   EmployeeName = employee.Name,
@@ -472,6 +497,7 @@ namespace Linq_Ejercicio01
 
         /*          
           * ****************************************************************************************************************************
+          * Ejercicio 4. join 3 tablas 
         */
 
 
@@ -497,7 +523,7 @@ namespace Linq_Ejercicio01
 
                 foreach (var employee in joins)
                 {
-                    Console.WriteLine("ID: {0}, \t Name {1}, \t Address: {2}, \t Department: {3}", 
+                    Console.WriteLine("ID: {0}, \t Name {1}, \t Address: {2}, \t Department: {3}",
                         employee.ID, employee.Name, employee.Address, employee.Department);
                 }
             }
@@ -599,8 +625,72 @@ namespace Linq_Ejercicio01
 
 
         /*          
-  * ****************************************************************************************************************************
-*/
+           * ****************************************************************************************************************************
+           * Ejercicio 5. join 2 tablas 
+        */
+
+        class ControlEmployeeDepartment3
+        {
+            //Outer Data Source
+            //Inner Data Source
+            //Outer Key Selector
+            //Inner Key Selector
+            //Result Selector
+
+            public void groupJoinMethodSyntax()
+            {
+                var groupJoin = Department3.GetAllDepartments()
+                                .GroupJoin(
+                                    Employee3.GetAllEmployees(),
+                                    d => d.ID,
+                                    e => e.DepartmentId,
+                                    (d, e) => new
+                                    {
+                                        // Personalizar nombre de 
+                                        Dep = d,
+                                        Empl = e
+                                    }
+                                );
+
+                foreach (var item in groupJoin)
+                {
+                    Console.WriteLine("Departmen: {0}, id: {1}", item.Dep.Name, item.Dep.ID);
+
+                    foreach (var e in item.Empl)
+                    {
+                        Console.WriteLine("\t*Employee: {0}, id: {1}", e.Name, e.ID);
+                    }
+                }
+            }
+
+            public void groupJoinQuerySyntax()
+            {
+                // Data Source Outer
+                var groupJoin = from d in Department3.GetAllDepartments()
+                                    // Inner data source
+                                join e in Employee3.GetAllEmployees()
+                                on d.ID equals e.DepartmentId
+                                into G
+                                select new
+                                {
+                                    // Personalizando nombres en ResultSet
+                                    Dep = d,
+                                    Employees = G
+                                };
+
+                Console.WriteLine("\n");
+                foreach (var item in groupJoin)
+                {
+                    Console.WriteLine("DepID: {0}, DepName {1}", item.Dep.ID, item.Dep.Name);
+
+                    foreach (var employee in item.Employees)
+                    {
+                        Console.WriteLine("\t* ID: {0}, Name: {1}", employee.ID, employee.Name);
+                    }
+                }
+
+            }
+        }
 
         public class Employee3
         {
@@ -638,6 +728,235 @@ namespace Linq_Ejercicio01
                     new Department3 { ID = 20, Name = "HR"},
                     new Department3 { ID = 30, Name = "Sales"  },
                 };
+            }
+        }
+
+
+        class ControlSelectMany
+        {
+            public void selectMany()
+            {
+                List<string> nameList = new List<string>() { "Pranaya1", "Kumar2" };
+
+                IEnumerable<char> methodSyntax = nameList.SelectMany(x => x);
+
+                Console.WriteLine("\n SelectMany Method Syntax");
+
+                foreach (char c in methodSyntax)
+                {
+                    Console.Write(c + " ");
+                }
+            }
+
+            public void selectManyQuerySyntax()
+            {
+                List<string> nameList = new List<string>() { "Cadena1", "segundaCadena" };
+
+                IEnumerable<char> querySyntax = from str in nameList
+                                                from ch in str
+                                                select ch;
+
+                Console.WriteLine("\n SelectMany Query Syntax");
+                foreach (char c in querySyntax)
+                {
+                    Console.Write(c + " ");
+                }
+            }
+
+
+            public void selectMany2ComplexType()
+            {
+                List<string> listMS = Student.GetStudents().SelectMany(std => std.Programming).ToList();
+
+                IEnumerable<string> listQS = from std in Student.GetStudents()
+                                             from program in std.Programming
+                                             select program;
+
+                Console.WriteLine("\n SelectMany Query Syntax - Complex Type");
+                foreach (string program in listMS)
+                {
+                    Console.WriteLine(program);
+                }
+            }
+
+            public void selectMany2Method()
+            {
+                List<string> listMS = Student.GetStudents()
+                                        .SelectMany(
+                                        std => std.Programming)
+                                        .Distinct()
+                                        .ToList();
+
+                Console.WriteLine("\n SelectMany Method Syntax Complex Type");
+                foreach (string program in listMS)
+                {
+                    Console.WriteLine(program);
+                }
+
+            }
+
+            public void selectMany2Query()
+            {
+                IEnumerable<string> listQS = (from std in Student.GetStudents()
+                                              from program in std.Programming
+                                              select program).Distinct().ToList();
+
+                Console.WriteLine("\n SelectMany Query Syntax");
+                foreach (string program in listQS)
+                {
+                    Console.WriteLine(program);
+                }
+            }
+
+            public void selectManyMethodSyntaxPersonalize()
+            {
+                var selectM = Student.GetStudents()
+                                .SelectMany(std => std.Programming,
+                                (student, program) => new
+                                {
+                                    StudentName = student.Name,
+                                    ProgramName = program
+                                }
+                                ).ToList();
+
+                Console.WriteLine("\n selectManyMethodSyntaxPersonalize");
+                foreach (var item in selectM)
+                {
+                    Console.WriteLine("Name: {0}, Program: {1}", item.StudentName, item.ProgramName);
+                }
+            }
+
+
+            public void selectManyQuerySyntaxPersonalize()
+            {
+                var selectQS = (from std in Student.GetStudents()
+                                from program in std.Programming
+                                select new
+                                {
+                                    StudentName = std.Name,
+                                    ProgramName = program
+                                }).ToList();
+
+                Console.WriteLine("\n selectManyQuerySyntaxPersonalize");
+                foreach (var item in selectQS)
+                {
+                    Console.WriteLine("Name: {0}, Program: {1}", item.StudentName, item.ProgramName);
+                }
+            }
+
+        }
+
+        public class Student
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public string Email { get; set; }
+            public List<string> Programming { get; set; }
+            public static List<Student> GetStudents()
+            {
+                return new List<Student>()
+            {
+                new Student(){ID = 1, Name = "James", Email = "James@j.com", Programming = new List<string>() { "C#", "Jave", "C++"} },
+                new Student(){ID = 2, Name = "Sam", Email = "Sara@j.com", Programming = new List<string>() { "WCF", "SQL Server", "C#" }},
+                new Student(){ID = 3, Name = "Patrik", Email = "Patrik@j.com", Programming = new List<string>() { "MVC", "Jave", "LINQ"} },
+                new Student(){ID = 4, Name = "Sara", Email = "Sara@j.com", Programming = new List<string>() { "ADO.NET", "C#", "LINQ" } }
+            };
+            }
+        }
+
+        /*          
+           * ****************************************************************************************************************************
+           * Ejercicio 6. LEFT JOIN
+        */
+
+
+        class ControlEmployeeAddress6
+        {
+
+            public void leftJoinQuerySyntax()
+            {
+                // STEP 1
+                var lj = from e in Employee6.GetAllEmployees()
+                         join a in Address6.GetAddress()
+                         on e.AddressId equals a.ID
+                         into EAGroup
+                         // STEP 2
+                         from address in EAGroup.DefaultIfEmpty()
+                         select new
+                         {
+                             e,
+                             address
+                         };
+
+                Console.WriteLine("\n leftJoinQuerySyntax");
+
+                foreach (var item in lj)
+                {
+                    Console.WriteLine("Name: {0}, Address: {1}", item.e.Name, item.address?.AddressLine);
+                }
+            }
+
+            public void leftJoinMethodSyntax()
+            {
+                var lj = Employee6.GetAllEmployees()
+                         .GroupJoin(
+                            Address6.GetAddress(),
+                            e => e.AddressId,
+                            a => a.ID,
+                            (e, a) => new
+                            {
+                                e,
+                                a
+                            })
+                         .SelectMany(
+                            x => x.a.DefaultIfEmpty(),
+                            (employee, address) => new
+                            {
+                                // Personalizar nombres - Anonymous Type
+                                EmployeeName = employee.e.Name,
+                                AddressLine = address == null ? "NA" : address.AddressLine
+                            });
+
+                Console.WriteLine("\n leftJoinMethodSyntax");
+                foreach (var item in lj)
+                {
+                    Console.WriteLine("Name {0}, Address: {1}", item.EmployeeName, item.AddressLine);
+                }
+            }
+
+        }
+
+        public class Employee6
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public int AddressId { get; set; }
+            public static List<Employee6> GetAllEmployees()
+            {
+                return new List<Employee6>()
+            {
+                new Employee6 { ID = 1, Name = "Preety", AddressId = 1},
+                new Employee6 { ID = 2, Name = "Priyanka", AddressId =2},
+                new Employee6 { ID = 3, Name = "Anurag", AddressId = 0},
+                new Employee6 { ID = 4, Name = "Pranaya", AddressId = 0},
+                new Employee6 { ID = 5, Name = "Hina", AddressId = 5},
+                new Employee6 { ID = 6, Name = "Sambit", AddressId = 6}
+            };
+            }
+        }
+        public class Address6
+        {
+            public int ID { get; set; }
+            public string AddressLine { get; set; }
+            public static List<Address6> GetAddress()
+            {
+                return new List<Address6>()
+            {
+                new Address6 { ID = 1, AddressLine = "AddressLine1"},
+                new Address6 { ID = 2, AddressLine = "AddressLine2"},
+                new Address6 { ID = 5, AddressLine = "AddressLine5"},
+                new Address6 { ID = 6, AddressLine = "AddressLine6"},
+            };
             }
         }
 
