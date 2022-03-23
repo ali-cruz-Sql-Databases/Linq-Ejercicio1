@@ -22,7 +22,8 @@ namespace Linq_Ejercicio01
             //fabricaProductOrder.getCrossJoin();
             //fabricaProductOrder.getGroupJoin();
 
-            //fabricaProductOrder.getOrderByProduct();
+            Console.WriteLine("getOrderByProduct");
+            fabricaProductOrder.getOrderByProduct();
 
             //fabricaProductOrder.getOrderDetailsExtencionMethods();
 
