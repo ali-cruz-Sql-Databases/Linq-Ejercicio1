@@ -54,7 +54,9 @@ namespace Linq_Ejercicio01
 
             ControlEmployeeAddress6 cELeftJoin = new ControlEmployeeAddress6();
             cELeftJoin.leftJoinQuerySyntax();
+            Console.WriteLine("\nleftJoinMethodSyntax\n");
             cELeftJoin.leftJoinMethodSyntax();
+            Console.WriteLine("\n // leftJoinMethodSyntax\n");
 
 
 
